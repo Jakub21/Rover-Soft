@@ -9,7 +9,7 @@ class Interface(Plugin):
     grid.DEFAULTS.marginX = 4
     grid.DEFAULTS.marginY = 4
 
-    variant = 'controller' # TODO
+    variant = Settings.Custom.programVariant
     self.root = tki.Root(self.cnf.title[variant])
     self.root.setMinSize(self.cnf.WINDOW.minWidth, self.cnf.WINDOW.minHeight)
     self.root.setSlotsWeights(0, 0, 1)
