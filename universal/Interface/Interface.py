@@ -2,6 +2,7 @@
 class Interface(Plugin):
   def init(self):
     super().init()
+    self.statusWidgets = {}
     self.addEventHandler('PluginStatus', self.handleStatus)
 
     grid = tki.positioners.Register.get('Grid')
@@ -30,11 +31,14 @@ class Interface(Plugin):
     tkw.Label(self.header, self.cnf.title[variant], heading=3)
     tkw.Separator(self.header)
 
+    view = tki.View(self.root, 'home', 0)
+    view.pst.setColWrap(2)
+    self.root.show('home')
+
   def update(self):
     super().update()
     if self.root.leave: self.stopProgram()
     else: self.root.update()
-    if self.tick == 1e5: print(what)
 
   def quit(self):
     super().quit()
@@ -42,4 +46,13 @@ class Interface(Plugin):
     except TclError: pass
 
   def handleStatus(self, evt):
-    pass
+    for key, val in evt.data.items():
+      id = f'{evt.pluginKey}::{key}'
+      if type(val) == float: val = round(val, 3)
+      val = str(val)
+      if id in self.statusWidgets.keys():
+        self.statusWidgets[id].setContent(val)
+      else:
+        view = self.root.views['home']
+        tkw.Label(view, id)
+        self.statusWidgets[id] = tkw.Output(view, id, val)

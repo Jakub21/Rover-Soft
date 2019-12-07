@@ -32,15 +32,10 @@ class Gamepad(Plugin):
         cnf.gpSpecs.balls != len(cnf.keysBalls):
       raise ValueError('Invalid gamepad specification (controlls amount mismatch)')
 
-    # Add status output
-    self.readGamepadStatus()
-    for key in self.status.keys():
-      self.addToStatus(key, lambda: self.status[key])
-
   def update(self):
     super().update()
     self.readGamepadStatus()
-    self.pluginStatus()
+    self.setPluginOutputs(**self.status.__dict__)
 
   def readGamepadStatus(self):
     cnf = self.cnf
