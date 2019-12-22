@@ -26,7 +26,9 @@ class TcpServer(Plugin):
   def receive(self):
     try:
       data = self.socket.recv(self.cnf.incomingBufferSize)
-      if len(data) > 0: self.parser.pushBytes(data)
+      if len(data) > 0:
+        Debug(f'Received {len(data)}b')
+        self.parser.pushBytes(data)
     except scklib.timeout: pass
     except (ConnectionAbortedError, ConnectionResetError, OSError) as exc:
       self.raiseError(exc.__class__.__name__, exc, False, 'Connection was broken')
