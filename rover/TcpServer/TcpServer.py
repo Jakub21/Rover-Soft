@@ -43,7 +43,7 @@ class TcpServer(Plugin):
       address, port = address
       self.connection.address, self.connection.port = address, port
       self.connection.state = True
-      self.logNote(f'Successfully connected to {address}:{port}')
+      Note(self, f'Successfully connected to {address}:{port}')
     except (BlockingIOError, OSError):
       self.connection.state = False
 
