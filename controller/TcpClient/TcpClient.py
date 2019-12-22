@@ -21,19 +21,22 @@ class TcpClient(Plugin):
 
   def update(self):
     super().update()
+    self.setPluginOutputs(connected=self.connection.state)
     if self.connection.state:
       self.receive()
       self.handleReceivedData()
 
   def connect(self, params):
-    params.port  = int(params.port)
+    try: params.port  = int(params.port)
+    except ValueError: Warn(self, 'Port must be a number'); return
     Info(self, f'Connecting to {params.address}:{params.port}')
-    self.socket.setblocking(1)
+    self.socket.settimeout(self.cnf.connTimeOut)
     try:
       socket = self.socket.connect((params.address, params.port))
       Note(self, 'Connected')
-    except (scklib.gaierror, BlockingIOError): Warn(self, 'Could not connect')
-    self.socket.setblocking(0)
+    except (scklib.gaierror, BlockingIOError, scklib.timeout):
+      Warn(self, 'Failed to establish connection')
+    self.socket.settimeout(self.cnf.connTimeOut)
 
   def receive(self):
     try:
@@ -44,8 +47,10 @@ class TcpClient(Plugin):
       self.raiseError(exc.__class__.__name__, exc, False, 'Connection was broken')
 
   def transmit(self, event):
+    if not self.connection.state: return
     query = Cis.Query(event.id, **event.getArgs())
     data = query.build()
+    Warn(self, data)
     self.socket.send(data)
 
   @staticmethod
