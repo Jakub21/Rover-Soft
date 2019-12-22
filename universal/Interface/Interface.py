@@ -3,6 +3,7 @@ class Interface(Plugin):
   def init(self):
     super().init()
     self.statusWidgets = {}
+    self.nodes = {} # automated handling of plugin input nodes
     self.addEventHandler('PluginStatus', self.handleStatus)
 
     grid = tki.positioners.Register.get('Grid')
@@ -45,9 +46,9 @@ class Interface(Plugin):
     try: self.root.quit()
     except TclError: pass
 
-  def handleStatus(self, evt):
-    for key, val in evt.data.items():
-      id = f'{evt.pluginKey}::{key}'
+  def handleStatus(self, event):
+    for key, val in event.data.items():
+      id = f'{event.pluginKey}::{key}'
       if type(val) == float: val = round(val, 3)
       val = str(val)
       if id in self.statusWidgets.keys():
@@ -56,3 +57,22 @@ class Interface(Plugin):
         view = self.root.views['home']
         tkw.Label(view, id)
         self.statusWidgets[id] = tkw.Output(view, id, val)
+
+  def onProgramInit(self, event):
+    view = self.root.views['home']
+    self.nodes = {k:Namespace(**d) for k, d in event.nodes.items()}
+    for node in self.nodes.values():
+      id = f'{node.owner}_{node.key}'
+      tkw.Label(view, f'{node.owner} {node.key}', heading=3)
+      view.pst.newLine()
+      for param in node.paramKeys:
+        tkw.Label(view, f'{param}')
+        tkw.Input(view, f'{id}_In_{param}')
+      tkw.Button(view, f'{id}_Confirm_', node.key, lambda: self.onAutoButton(id))
+      view.pst.newLine()
+
+  def onAutoButton(self, id):
+    node = self.nodes[id]
+    params = {key: self.root.getByKey(f'{id}_In_{key}').read() \
+      for key in node.paramKeys}
+    event = Event(self, f'$_{id}', **params)

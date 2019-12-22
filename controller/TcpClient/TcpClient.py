@@ -10,6 +10,7 @@ class TcpClient(Plugin):
       port = self.cnf.DEFAULTS.targetPort)
     self.initSocket()
     self.addEventHandler('Transmit', self.transmit)
+    self.addInputNode('Connect', self.connect, 'address', 'port')
 
   def initSocket(self):
     self.socket = scklib.socket()
@@ -23,6 +24,16 @@ class TcpClient(Plugin):
     if self.connection.state:
       self.receive()
       self.handleReceivedData()
+
+  def connect(self, params):
+    params.port  = int(params.port)
+    Info(self, f'Connecting to {params.address}:{params.port}')
+    self.socket.setblocking(1)
+    try:
+      socket = self.socket.connect((params.address, params.port))
+      Note(self, 'Connected')
+    except (scklib.gaierror, BlockingIOError): Warn(self, 'Could not connect')
+    self.socket.setblocking(0)
 
   def receive(self):
     try:

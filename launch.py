@@ -10,5 +10,4 @@ if __name__ == '__main__':
     'Logger.timeMode': 'relative',
   })
   prog.preload()
-  prog.init()
   prog.run()
