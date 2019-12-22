@@ -10,6 +10,7 @@ class TcpClient(Plugin):
       port = self.cnf.DEFAULTS.targetPort)
     self.initSocket()
     self.addEventHandler('Transmit', self.transmit)
+    self.addInputNode('Rebind', self.rebind, 'port')
     self.addInputNode('Connect', self.connect, 'address', 'port')
 
   def initSocket(self):
@@ -17,7 +18,7 @@ class TcpClient(Plugin):
     Note(self, f'Binding new socket to {self.ownAddress}:{self.usedPort}')
     self.socket.bind((self.ownAddress, self.usedPort))
     self.socket.settimeout(self.cnf.timeOut)
-    self.connection = Namespace(state=False)
+    self.connection = Namespace(state=False, socket=None)
 
   def update(self):
     super().update()
@@ -33,10 +34,20 @@ class TcpClient(Plugin):
     self.socket.settimeout(self.cnf.connTimeOut)
     try:
       socket = self.socket.connect((params.address, params.port))
+      self.connection.socket = socket
+      self.connection.state = True
       Note(self, 'Connected')
     except (scklib.gaierror, BlockingIOError, scklib.timeout):
       Warn(self, 'Failed to establish connection')
+    except OSError:
+      Warn(self, 'OS Error (try connecting from another port)')
     self.socket.settimeout(self.cnf.connTimeOut)
+
+  def rebind(self, params):
+    try: params.port  = int(params.port)
+    except ValueError: Warn(self, 'Port must be a number'); return
+    self.usedPort = params.port
+    self.initSocket()
 
   def receive(self):
     try:
@@ -50,8 +61,9 @@ class TcpClient(Plugin):
     if not self.connection.state: return
     query = Cis.Query(event.id, **event.getArgs())
     data = query.build()
-    Warn(self, data)
-    self.socket.send(data)
+    try: self.socket.send(data)
+    except (ConnectionAbortedError, ConnectionResetError) as exc:
+      self.raiseError(exc.__class__.__name__, exc, False, 'Connection was broken')
 
   @staticmethod
   def getOwnAddress():
