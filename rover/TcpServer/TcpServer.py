@@ -31,7 +31,8 @@ class TcpServer(Plugin):
         self.parser.pushBytes(data)
     except scklib.timeout: pass
     except (ConnectionAbortedError, ConnectionResetError, OSError) as exc:
-      self.raiseError(exc.__class__.__name__, exc, False, 'Connection was broken')
+      Error(self, 'Connection was broken')
+      self.initSocket()
 
   def transmit(self, event):
     if not self.connection.state: return

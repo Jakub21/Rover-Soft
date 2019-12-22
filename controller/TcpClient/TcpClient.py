@@ -69,10 +69,10 @@ class TcpClient(Plugin):
     try: self.socket.send(data)
     except scklib.timeout as exc:
       Error(self, 'Transmission timeout')
-      self.onDisconnect()
+      self.initSocket()
     except (ConnectionAbortedError, ConnectionResetError) as exc:
       Error(self, 'Connection was broken')
-      self.onDisconnect()
+      self.initSocket()
 
   @staticmethod
   def getOwnAddress():
@@ -86,9 +86,6 @@ class TcpClient(Plugin):
     while not self.parser.queries.empty():
       query = self.parser.queries.pop()
       PluginEvent(self, query.key, **query.params)
-
-  def onDisconnect(self):
-    self.initSocket()
 
   def quit(self):
     super().quit()
