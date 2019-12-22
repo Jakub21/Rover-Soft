@@ -62,8 +62,8 @@ class TcpClient(Plugin):
       self.onDisconnect()
 
   def transmit(self, event):
-    Debug(self, 'Transmiting')
     if not self.connection.state: return
+    Debug(self, 'Transmiting')
     query = Cis.Query(event.id, **event.getArgs())
     data = query.build()
     try: self.socket.send(data)
