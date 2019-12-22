@@ -34,6 +34,7 @@ class TcpServer(Plugin):
       self.raiseError(exc.__class__.__name__, exc, False, 'Connection was broken')
 
   def transmit(self, event):
+    Debug(self, 'Transmiting')
     query = Cis.Query(event.id, **event.getArgs())
     data = query.build()
     self.socket.send(data)

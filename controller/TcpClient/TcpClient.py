@@ -34,6 +34,7 @@ class TcpClient(Plugin):
     self.socket.settimeout(self.cnf.connTimeOut)
     try:
       socket = self.socket.connect((params.address, params.port))
+      Note(self, socket)
       self.connection.socket = socket
       self.connection.state = True
       Note(self, 'Connected')
@@ -57,17 +58,21 @@ class TcpClient(Plugin):
         self.parser.pushBytes(data)
     except scklib.timeout: pass
     except (ConnectionAbortedError, ConnectionResetError) as exc:
-      self.raiseError(exc.__class__.__name__, exc, False, 'Connection was broken')
+      Error(self, 'Connection was broken')
+      self.onDisconnect()
 
   def transmit(self, event):
+    Debug(self, 'Transmiting')
     if not self.connection.state: return
     query = Cis.Query(event.id, **event.getArgs())
     data = query.build()
     try: self.socket.send(data)
     except scklib.timeout as exc:
-      self.raiseError(exc.__class__.__name__, exc, False, 'Transmission timeout')
+      Error(self, 'Transmission timeout')
+      self.onDisconnect()
     except (ConnectionAbortedError, ConnectionResetError) as exc:
-      self.raiseError(exc.__class__.__name__, exc, False, 'Connection was broken')
+      Error(self, 'Connection was broken')
+      self.onDisconnect()
 
   @staticmethod
   def getOwnAddress():
@@ -81,6 +86,9 @@ class TcpClient(Plugin):
     while not self.parser.queries.empty():
       query = self.parser.queries.pop()
       PluginEvent(self, query.key, **query.params)
+
+  def onDisconnect(self):
+    self.initSocket()
 
   def quit(self):
     super().quit()

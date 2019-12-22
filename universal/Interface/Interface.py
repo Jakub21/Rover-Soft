@@ -63,7 +63,6 @@ class Interface(Plugin):
     self.nodes = {k:Namespace(**d) for k, d in event.nodes.items()}
     for node in self.nodes.values():
       id = f'{node.owner}_{node.key}'
-      Error(self, id)
       tkw.Label(view, f'{node.owner} {node.key}', heading=3)
       view.pst.newLine()
       for param in node.paramKeys:
@@ -75,7 +74,6 @@ class Interface(Plugin):
       view.pst.newLine()
 
   def onAutoButton(self, id):
-    Warn(self, id)
     node = self.nodes[id]
     params = {key: self.root.getByKey(f'{id}_In_{key}').read() \
       for key in node.paramKeys}
