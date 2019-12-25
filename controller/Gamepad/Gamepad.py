@@ -36,7 +36,7 @@ class Gamepad(Plugin):
     super().update()
     self.readGamepadStatus()
     self.setPluginOutputs(**self.status.__dict__)
-    Event(self, 'Transmit', key='Gamepad' **self.status.__dict__)
+    Event(self, 'Transmit', key='Gamepad', **self.status.__dict__)
 
   def readGamepadStatus(self):
     cnf = self.cnf
