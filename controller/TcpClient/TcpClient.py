@@ -44,6 +44,7 @@ class TcpClient(Plugin):
     self.socket.settimeout(self.cnf.connTimeOut)
 
   def disconnect(self, params, reinit=True):
+    Warn(self, 'Disconnecting')
     try:
       self.socket.shutdown(1)
       self.socket.close()
@@ -87,6 +88,7 @@ class TcpClient(Plugin):
     return address
 
   def handleReceivedData(self):
+    self.parser.parse()
     while not self.parser.queries.empty():
       Debug(self, 'Popped CIS query')
       query = self.parser.queries.pop()

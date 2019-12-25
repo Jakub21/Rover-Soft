@@ -34,6 +34,7 @@ class TcpServer(Plugin):
     else: self.acceptConnection()
 
   def disconnect(self, params):
+    Warn(self, 'Disconnecting')
     self.socket.close()
     self.initSocket()
 
@@ -81,6 +82,7 @@ class TcpServer(Plugin):
     return address
 
   def handleReceivedData(self):
+    self.parser.parse()
     while not self.parser.queries.empty():
       Debug(self, 'Popped CIS query')
       query = self.parser.queries.pop()
