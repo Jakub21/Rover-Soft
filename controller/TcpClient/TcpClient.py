@@ -43,7 +43,7 @@ class TcpClient(Plugin):
       Warn(self, 'OS Error (try connecting from another port)')
     self.socket.settimeout(self.cnf.connTimeOut)
 
-  def disconnect(self, params, reinit=True):
+  def disconnect(self, params=None, reinit=True):
     Warn(self, 'Disconnecting')
     try:
       self.socket.shutdown(1)

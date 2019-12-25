@@ -28,15 +28,18 @@ class TcpServer(Plugin):
     )
     if self.connection.state:
       if not(self.tick % 128):
-        Event(self, 'Transmit', key='dummy', alive='yes', tick=self.tick)
+        Event(self, 'Transmit', key='dummy', Alive='Yes', Tick=self.tick)
       self.receive()
       self.handleReceivedData()
     else: self.acceptConnection()
 
-  def disconnect(self, params):
+  def disconnect(self, params=None, reinit=True):
     Warn(self, 'Disconnecting')
-    self.socket.close()
-    self.initSocket()
+    try:
+      self.socket.shutdown(1)
+      self.socket.close()
+    except OSError: Warn(self, 'Can not disconnect (not connected)'); return
+    if reinit: self.initSocket()
 
   def rebind(self, params):
     try: params.port  = int(params.port)
