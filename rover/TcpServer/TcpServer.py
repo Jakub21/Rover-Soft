@@ -27,8 +27,6 @@ class TcpServer(Plugin):
       Port = self.connection.port,
     )
     if self.connection.state:
-      if not(self.tick % 128):
-        Event(self, 'Transmit', key='dummy', Alive='Yes', Tick=self.tick)
       self.receive()
       self.handleReceivedData()
     else: self.acceptConnection()
@@ -92,7 +90,6 @@ class TcpServer(Plugin):
     self.parser.parse()
     while not self.parser.queries.empty():
       query = self.parser.queries.pop()
-      Debug(self, f'Popped {query}')
       Event(self, query.key, **query.params)
 
   def onDisconnect(self):

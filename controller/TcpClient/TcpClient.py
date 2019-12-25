@@ -95,7 +95,6 @@ class TcpClient(Plugin):
     self.parser.parse()
     while not self.parser.queries.empty():
       query = self.parser.queries.pop()
-      Debug(self, f'Popped {query}')
       Event(self, query.key, **query.params)
 
   def quit(self):
