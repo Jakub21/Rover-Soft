@@ -84,9 +84,9 @@ class TcpServer(Plugin):
   def handleReceivedData(self):
     self.parser.parse()
     while not self.parser.queries.empty():
-      Debug(self, 'Popped CIS query')
       query = self.parser.queries.pop()
-      PluginEvent(self, query.key, **query.params)
+      Debug(self, f'Popped {query}')
+      Event(self, query.key, **query.params)
 
   def onDisconnect(self):
     self.socket.close()
