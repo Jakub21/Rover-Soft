@@ -12,10 +12,11 @@ class TcpClient(Plugin):
     self.addEventHandler('Transmit', self.transmit)
     self.addInputNode('Rebind', self.rebind, 'port')
     self.addInputNode('Connect', self.connect, 'address', 'port')
+    self.addInputNode('Disconnect', self.disconnect)
 
   def initSocket(self):
     self.socket = scklib.socket()
-    Note(self, f'Binding new socket to {self.ownAddress}:{self.usedPort}')
+    Note(self, f'Binding TPC client to {self.ownAddress}:{self.usedPort}')
     self.socket.bind((self.ownAddress, self.usedPort))
     self.socket.settimeout(self.cnf.timeOut)
     self.connection = Namespace(state=False)
@@ -41,6 +42,10 @@ class TcpClient(Plugin):
     except OSError:
       Warn(self, 'OS Error (try connecting from another port)')
     self.socket.settimeout(self.cnf.connTimeOut)
+
+  def disconnect(self, params):
+    self.socket.close()
+    self.initSocket()
 
   def rebind(self, params):
     try: params.port  = int(params.port)
@@ -79,8 +84,10 @@ class TcpClient(Plugin):
 
   def handleReceivedData(self):
     while not self.parser.queries.empty():
+      Debug(self, 'Popped CIS query')
       query = self.parser.queries.pop()
       PluginEvent(self, query.key, **query.params)
 
   def quit(self):
     super().quit()
+    self.socket.close()

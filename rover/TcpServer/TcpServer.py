@@ -7,10 +7,12 @@ class TcpServer(Plugin):
     self.usedPort = self.cnf.DEFAULTS.usedPort
     self.initSocket()
     self.addEventHandler('Transmit', self.transmit)
+    self.addInputNode('Rebind', self.rebind, 'port')
+    self.addInputNode('Disconnect', self.disconnect)
 
   def initSocket(self):
     self.socket = scklib.socket()
-    Note(self, f'Binding new socket to {self.ownAddress}:{self.usedPort}')
+    Note(self, f'Binding TPC server to {self.ownAddress}:{self.usedPort}')
     self.socket.bind((self.ownAddress, self.usedPort))
     self.socket.settimeout(self.cnf.timeOut)
     self.connection = Namespace(state=False, socket=None, address='', port=0)
@@ -18,10 +20,25 @@ class TcpServer(Plugin):
 
   def update(self):
     super().update()
+    self.setPluginOutputs(
+      connected = self.connection.state,
+      address = self.connection.address,
+      port = self.connection.port,
+    )
     if self.connection.state:
       self.receive()
       self.handleReceivedData()
     else: self.acceptConnection()
+
+  def disconnect(self, params):
+    self.socket.close()
+    self.initSocket()
+
+  def rebind(self, params):
+    try: params.port  = int(params.port)
+    except ValueError: Warn(self, 'Port must be a number'); return
+    self.usedPort = params.port
+    self.initSocket()
 
   def receive(self):
     try:
@@ -59,6 +76,7 @@ class TcpServer(Plugin):
 
   def handleReceivedData(self):
     while not self.parser.queries.empty():
+      Debug(self, 'Popped CIS query')
       query = self.parser.queries.pop()
       PluginEvent(self, query.key, **query.params)
 
@@ -68,3 +86,4 @@ class TcpServer(Plugin):
 
   def quit(self):
     super().quit()
+    self.socket.close()
