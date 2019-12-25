@@ -8,9 +8,9 @@ class Kinematics(Plugin):
     super().update()
 
   def onGamepadChange(self, event):
-    state = **event.getArgs()
+    state = event.getArgs()
     del state['issuer']
-    self.setPluginOutputs(state)
+    self.setPluginOutputs(**state)
 
   def quit(self):
     super().quit()
