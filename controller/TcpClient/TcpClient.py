@@ -18,7 +18,7 @@ class TcpClient(Plugin):
     Note(self, f'Binding new socket to {self.ownAddress}:{self.usedPort}')
     self.socket.bind((self.ownAddress, self.usedPort))
     self.socket.settimeout(self.cnf.timeOut)
-    self.connection = Namespace(state=False, socket=None)
+    self.connection = Namespace(state=False)
 
   def update(self):
     super().update()
@@ -34,8 +34,6 @@ class TcpClient(Plugin):
     self.socket.settimeout(self.cnf.connTimeOut)
     try:
       socket = self.socket.connect((params.address, params.port))
-      Note(self, socket)
-      self.connection.socket = socket
       self.connection.state = True
       Note(self, 'Connected')
     except (scklib.gaierror, BlockingIOError, scklib.timeout):
@@ -59,7 +57,7 @@ class TcpClient(Plugin):
     except scklib.timeout: pass
     except (ConnectionAbortedError, ConnectionResetError) as exc:
       Error(self, 'Connection was broken')
-      self.onDisconnect()
+      self.initSocket()
 
   def transmit(self, event):
     if not self.connection.state: return

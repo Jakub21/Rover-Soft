@@ -32,7 +32,7 @@ class TcpServer(Plugin):
     except scklib.timeout: pass
     except (ConnectionAbortedError, ConnectionResetError, OSError) as exc:
       Error(self, 'Connection was broken')
-      self.initSocket()
+      self.onDisconnect()
 
   def transmit(self, event):
     if not self.connection.state: return
@@ -64,6 +64,10 @@ class TcpServer(Plugin):
     while not self.parser.queries.empty():
       query = self.parser.queries.pop()
       PluginEvent(self, query.key, **query.params)
+
+  def onDisconnect(self):
+    self.socket.close()
+    self.initSocket()
 
   def quit(self):
     super().quit()
