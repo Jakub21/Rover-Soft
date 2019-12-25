@@ -61,7 +61,7 @@ class TcpClient(Plugin):
   def receive(self):
     try:
       data = self.socket.recv(self.cnf.incomingBufferSize)
-      if len(data) > 0: Debug(self, data); self.parser.pushBytes(data)
+      if len(data) > 0: self.parser.pushBytes(data)
     except scklib.timeout: pass
     except (ConnectionAbortedError, ConnectionResetError) as exc:
       Error(self, 'Connection was broken')
@@ -69,7 +69,11 @@ class TcpClient(Plugin):
 
   def transmit(self, event):
     if not self.connection.state: return
-    query = Cis.Query(event.id, **event.getArgs())
+    try: key = event.key
+    except AttributeError:
+      Warn('Can not convert event to Query, please specify query key')
+    args = {k:v for k,v in event.getArgs().items() if k not in ('issuer', 'key')}
+    query = Cis.Query(key, args)
     data = query.build()
     try: self.socket.send(data)
     except scklib.timeout as exc:
