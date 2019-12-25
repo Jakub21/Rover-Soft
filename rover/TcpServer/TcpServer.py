@@ -27,6 +27,8 @@ class TcpServer(Plugin):
       Port = self.connection.port,
     )
     if self.connection.state:
+      if not(self.tick % 128):
+        Event(self, 'Transmit', alive='yes', tick=self.tick)
       self.receive()
       self.handleReceivedData()
     else: self.acceptConnection()
