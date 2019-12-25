@@ -59,7 +59,7 @@ class TcpServer(Plugin):
     except AttributeError:
       Warn(self, 'Can not convert event to Query, please specify query key')
     args = {k:v for k,v in event.getArgs().items() if k not in ('issuer', 'key')}
-    query = Cis.Query(key, args)
+    query = Cis.Query(key, **args)
     data = query.build()
     try: self.connection.socket.send(data)
     except BrokenPipeError:
