@@ -25,7 +25,7 @@ class TcpServer(Plugin):
 
   def receive(self):
     try:
-      data = self.socket.recv(self.cnf.incomingBufferSize)
+      data = self.connection.socket.recv(self.cnf.incomingBufferSize)
       if len(data) > 0:
         Debug(f'Received {len(data)}b')
         self.parser.pushBytes(data)
@@ -39,7 +39,7 @@ class TcpServer(Plugin):
     Debug(self, 'Transmiting')
     query = Cis.Query(event.id, **event.getArgs())
     data = query.build()
-    self.socket.send(data)
+    self.connection.socket.send(data)
 
   def acceptConnection(self):
     try:
