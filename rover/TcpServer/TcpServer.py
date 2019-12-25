@@ -28,7 +28,7 @@ class TcpServer(Plugin):
     )
     if self.connection.state:
       if not(self.tick % 128):
-        Event(self, 'Transmit', alive='yes', tick=self.tick)
+        Event(self, 'Transmit', key='dummy', alive='yes', tick=self.tick)
       self.receive()
       self.handleReceivedData()
     else: self.acceptConnection()
@@ -57,7 +57,7 @@ class TcpServer(Plugin):
     if not self.connection.state: return
     try: key = event.key
     except AttributeError:
-      Warn('Can not convert event to Query, please specify query key')
+      Warn(self, 'Can not convert event to Query, please specify query key')
     args = {k:v for k,v in event.getArgs().items() if k not in ('issuer', 'key')}
     query = Cis.Query(key, args)
     data = query.build()

@@ -71,7 +71,7 @@ class TcpClient(Plugin):
     if not self.connection.state: return
     try: key = event.key
     except AttributeError:
-      Warn('Can not convert event to Query, please specify query key')
+      Warn(self, 'Can not convert event to Query, please specify query key')
     args = {k:v for k,v in event.getArgs().items() if k not in ('issuer', 'key')}
     query = Cis.Query(key, args)
     data = query.build()
