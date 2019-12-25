@@ -51,9 +51,7 @@ class TcpClient(Plugin):
   def receive(self):
     try:
       data = self.socket.recv(self.cnf.incomingBufferSize)
-      if len(data) > 0:
-        Debug(f'Received {len(data)}b')
-        self.parser.pushBytes(data)
+      if len(data) > 0: self.parser.pushBytes(data)
     except scklib.timeout: pass
     except (ConnectionAbortedError, ConnectionResetError) as exc:
       Error(self, 'Connection was broken')
@@ -61,7 +59,6 @@ class TcpClient(Plugin):
 
   def transmit(self, event):
     if not self.connection.state: return
-    Debug(self, 'Transmiting')
     query = Cis.Query(event.id, **event.getArgs())
     data = query.build()
     try: self.socket.send(data)
