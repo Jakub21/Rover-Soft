@@ -23,7 +23,7 @@ class TcpClient(Plugin):
 
   def update(self):
     super().update()
-    self.setPluginOutputs(connected=self.connection.state)
+    self.setPluginOutputs(Connected=self.connection.state)
     if self.connection.state:
       self.receive()
       self.handleReceivedData()
@@ -43,11 +43,15 @@ class TcpClient(Plugin):
       Warn(self, 'OS Error (try connecting from another port)')
     self.socket.settimeout(self.cnf.connTimeOut)
 
-  def disconnect(self, params):
-    self.socket.close()
-    self.initSocket()
+  def disconnect(self, params, reinit=True):
+    try:
+      self.socket.shutdown(1)
+      self.socket.close()
+    except OSError: Warn(self, 'Can not disconnect (not connected)'); return
+    if reinit: self.initSocket()
 
   def rebind(self, params):
+    if self.connection.state: self.disconnect(reinit=False)
     try: params.port  = int(params.port)
     except ValueError: Warn(self, 'Port must be a number'); return
     self.usedPort = params.port
@@ -90,4 +94,4 @@ class TcpClient(Plugin):
 
   def quit(self):
     super().quit()
-    self.socket.close()
+    self.disconnect(reinit=False)

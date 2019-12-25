@@ -13,6 +13,7 @@ class TcpServer(Plugin):
   def initSocket(self):
     self.socket = scklib.socket()
     Note(self, f'Binding TPC server to {self.ownAddress}:{self.usedPort}')
+    self.socket.setsockopt(scklib.SO_REUSEADDR)
     self.socket.bind((self.ownAddress, self.usedPort))
     self.socket.settimeout(self.cnf.timeOut)
     self.connection = Namespace(state=False, socket=None, address='', port=0)
@@ -21,9 +22,9 @@ class TcpServer(Plugin):
   def update(self):
     super().update()
     self.setPluginOutputs(
-      connected = self.connection.state,
-      address = self.connection.address,
-      port = self.connection.port,
+      Connected = self.connection.state,
+      Address = self.connection.address,
+      Port = self.connection.port,
     )
     if self.connection.state:
       self.receive()
