@@ -56,7 +56,10 @@ class TcpServer(Plugin):
     if not self.connection.state: return
     query = Cis.Query(event.id, **event.getArgs())
     data = query.build()
-    self.connection.socket.send(data)
+    try: self.connection.socket.send(data)
+    except BrokenPipeError:
+      Error(self, 'Connection was broken')
+      self.onDisconnect()
 
   def acceptConnection(self):
     try:
