@@ -8,7 +8,7 @@ class ArduCtrl(Plugin):
   def update(self):
     super().update()
     data = self.conn.read(self.cnf.ReadBytesPerLoop)
-    Debug(self, f'RECV {data}')
+    if len(data): Debug(self, f'RECV {data}')
 
   def transmit(self, event):
     self.conn.send(event.data)
