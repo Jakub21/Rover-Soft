@@ -9,11 +9,11 @@ class ArduCtrl(Plugin):
     super().update()
     data = self.conn.read(self.cnf.ReadBytesPerLoop)
     if len(data): Debug(self, f'RECV {data}')
-    if not(self.tick % self.executor.tpsMon.tps):
+    if not(self.tick % (2 * self.executor.tpsMon.tps)):
       Event(self, 'Arduino', data=b'DummyDataTransmission')
 
   def transmit(self, event):
-    self.conn.send(event.data)
+    self.conn.write(event.data)
 
   def quit(self):
     super().quit()
