@@ -7,14 +7,12 @@ class CamSender(Plugin):
     self.socket.connect(f'tcp://{self.cnf.receiverAddress}:{self.cnf.receiverPort}')
     self.socket.RCVTIMEO = int(self.cnf.timeOut * 1e3)
 
-    pgc.init()
-    self.camera = pgc.Camera(pgc.list_cameras()[self.cnf.cameraIndex])
-    self.camera.start()
+    self.camera = ocv.VideoCapture(self.cnf.cameraIndex)
 
   def update(self):
     super().update()
-    frame = self.camera.get_image()
-    Debug(self, f'Frame = {frame}')
+    success, frame = self.camera.read()
+    Debug(self, f'Success = {success} Frame = {frame}')
     size = self.cnf.transmitSize
     try: frame = ocv.resize(frame, (size.x, size.y))
     except ocv.error: return
@@ -25,4 +23,4 @@ class CamSender(Plugin):
 
   def quit(self):
     super().quit()
-    pgc.quit()
+    self.camera.release()
