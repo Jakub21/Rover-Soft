@@ -14,6 +14,7 @@ class CamSender(Plugin):
   def update(self):
     super().update()
     frame = self.camera.get_image()
+    Debug(self, f'Frame = {frame}')
     size = self.cnf.transmitSize
     try: frame = ocv.resize(frame, (size.x, size.y))
     except ocv.error: return
