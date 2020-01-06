@@ -5,6 +5,7 @@ class Interface(Plugin):
     self.statusWidgets = {}
     self.nodes = {} # automated handling of plugin input nodes
     self.addEventHandler('PluginStatus', self.handleStatus)
+    self.addEventHandler('NewCamFrame', self.handleCamFrame)
 
     grid = tki.positioners.Register.get('Grid')
     grid.DEFAULTS.marginX = 4
@@ -35,6 +36,10 @@ class Interface(Plugin):
     view = tki.View(self.root, 'home', 0)
     view.pst.setColWrap(2)
     self.root.show('home')
+
+    camView = tki.View(self.root, 'camera', 1)
+    self.frameHolderExists = False
+    self.canvas = None
 
   def update(self):
     super().update()
@@ -78,3 +83,12 @@ class Interface(Plugin):
     params = {key: self.root.getByKey(f'{id}_In_{key}').read() \
       for key in node.paramKeys}
     event = Event(self, f'$_{id}', **params)
+
+  def handleCamFrame(self, event):
+    if not self.frameHolderExists:
+      view = self.root.views['camera']
+      self.canvas = tkc.Canvas(view)
+      self.canvas.persistent(False)
+      self.frameHolderExists = True
+    self.canvas.fill('#000')
+    self.canvas.add(tkce.OcvImage(self.canvas, (0,0), (100,100), event.frame))
