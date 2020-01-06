@@ -14,7 +14,7 @@ class Interface(Plugin):
     variant = Settings.Custom.programVariant
     self.root = tki.Root(self.cnf.title[variant])
     self.root.setMinSize(self.cnf.WINDOW.minWidth, self.cnf.WINDOW.minHeight)
-    self.root.setSlotsWeights(0, 0, 1)
+    self.root.setSlotsWeights(0, 1)
 
     style = tki.Style()
     if systemName == 'nt': style.setTheme(self.cnf.THEME.wind)
@@ -34,10 +34,13 @@ class Interface(Plugin):
     tkw.Separator(self.header)
 
     view = tki.View(self.root, 'home', 0)
+    view.setColWeights(1)
     view.pst.setColWrap(2)
     self.root.show('home')
 
     camView = tki.View(self.root, 'camera', 1)
+    camView.setRowWeights(1)
+    camView.setColWeights(1)
     self.frameHolderExists = False
     self.canvas = None
 
@@ -87,8 +90,11 @@ class Interface(Plugin):
   def handleCamFrame(self, event):
     if not self.frameHolderExists:
       view = self.root.views['camera']
-      self.canvas = tkc.Canvas(view)
-      self.canvas.persistent(False)
+      self.root.show('camera')
+      self.canvas = tkc.Canvas(view, 'cameraCanvas', (40,30))
+      self.canvas.persistent(True)
+      self.canvas.background('#000')
       self.frameHolderExists = True
-    self.canvas.fill('#000')
-    self.canvas.add(tkce.OcvImage(self.canvas, (0,0), (100,100), event.frame))
+    elms = self.canvas.elements.persistent
+    if len(elms) >= 2: elms[0].remove() # TEMP
+    tkce.OcvImage(self.canvas, (0,0), (40,30), event.frame)
