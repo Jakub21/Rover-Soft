@@ -99,4 +99,4 @@ class TcpClient(Plugin):
 
   def quit(self):
     super().quit()
-    self.disconnect(reinit=False)
+    if self.connection.state: self.disconnect(reinit=False)
