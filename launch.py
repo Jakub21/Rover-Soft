@@ -6,8 +6,8 @@ if __name__ == '__main__':
     'programVariant': 'rover',
   })
   prog.updateSettings({
-    'Kernel.MaxProgramTicksPerSec': 400,
-    'Kernel.MaxExecutorTicksPerSec': 400,
+    'Kernel.MaxProgramTicksPerSec': 100,
+    'Kernel.MaxExecutorTicksPerSec': 80,
     'Compiler.pluginDirectories' : ['./universal', './rover'],
     'Logger.timeMode': 'relative',
   })

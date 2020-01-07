@@ -6,8 +6,9 @@ if __name__ == '__main__':
     'programVariant': 'controller',
   })
   prog.updateSettings({
-    'Kernel.MaxProgramTicksPerSec': 400,
-    'Kernel.MaxExecutorTicksPerSec': 400,
+    'Kernel.MaxProgramTicksPerSec': 100,
+    'Kernel.MaxExecutorTicksPerSec': 80,
+    'Kernel.AutoAddTpsToPluginOutputs': True,
     'Compiler.pluginDirectories' : ['./universal', './controller'],
     'Logger.timeMode': 'relative',
   })
