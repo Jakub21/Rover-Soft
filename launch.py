@@ -12,6 +12,11 @@ if __name__ == '__main__':
     'Logger.timeMode': 'relative',
   })
   prog.preload()
-  prog.configPlugin('ArduCtrl', { 'PortName': '/dev/ttyUSB0' })
-  prog.configPlugin('CamSender', { 'cameraIndex': 0 })
+  prog.configPlugin('ArduCtrl', {
+    'PortName': '/dev/ttyUSB0',
+  })
+  prog.configPlugin('CamSender', {
+    'cameraIndex': 0,
+    'receiverAddress': '192.168.1.102',
+  })
   prog.run()
