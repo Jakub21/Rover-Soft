@@ -12,4 +12,7 @@ if __name__ == '__main__':
     'Logger.timeMode': 'relative',
   })
   prog.preload()
+  prog.configPlugin('ArduCtrl', {
+    'PortName': '/dev/ttyUSB0',
+  })
   prog.run()
