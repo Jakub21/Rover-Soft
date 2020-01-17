@@ -96,5 +96,5 @@ class Interface(Plugin):
       self.canvas.background('#000')
       self.frameHolderExists = True
     elms = self.canvas.elements.persistent
-    if len(elms) >= 2: elms[0].remove() # TEMP
+    if len(elms) >= 5: elms[0].remove() # TEMP
     tkce.OcvImage(self.canvas, (0,0), (40,30), event.frame)
