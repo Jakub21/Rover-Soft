@@ -14,7 +14,7 @@ class Parser:
 
   def parse(self):
     while b'\n' in self.data:
-      index = :self.data.index(b'\n')
-      command = self.data[:index]
-      self.data = self.data[index:]
+      end = self.data.index(b'\n')
+      command = self.data[:end]
+      self.data = self.data[end:]
       self.received += [command]

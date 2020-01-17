@@ -7,6 +7,7 @@ class ArduCtrl(Plugin):
     self.parser = Parser()
     self.outFuncKeys = Namespace(
       RequestTmprReadings = 0,
+      SetServoPositions = 1,
     )
     self.inFuncKeys = {
       1: 'TmprRaspberry',
