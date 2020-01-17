@@ -25,11 +25,11 @@ class ArduCtrl(Plugin):
     while True:
       try:
         received = self.parser.pop()
-        Debug(f'RECV {received}')
+        Debug(self, f'RECV {received}')
       except IndexError: break
 
   def transmit(self, event):
-    Debug(f'SEND {event.data}')
+    Debug(self, f'SEND {event.data}')
     self.conn.write(event.data)
 
   def quit(self):
