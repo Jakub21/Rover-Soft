@@ -5,7 +5,7 @@ class ArduCtrl(Plugin):
     self.conn = SerialLib.Serial(self.cnf.PortName, self.cnf.Baudrate, timeout=0)
     self.addEventHandler('ArduSend', self.transmit)
     self.parser = Parser()
-    self.outputIDs = Namespace(
+    self.outputKeys = Namespace(
       RequestTmprReadings = self.itob(0),
       SetServoPositions = self.itob(1),
     )
@@ -19,7 +19,7 @@ class ArduCtrl(Plugin):
     super().update()
     self.setPluginOutputs()
     if not(self.__pluginable__.tick % (2 * self.executor.tpsMon.tps)):
-      Event(self, 'ArduSend', id=self.outputIDs.RequestTmprReadings)
+      Event(self, 'ArduSend', key=self.outputKeys.RequestTmprReadings)
     data = self.conn.read(self.cnf.ReadBytesPerLoop)
     Debug(self, f'RECV {data}')
     # if len(data): self.parser.push(data)
@@ -31,7 +31,7 @@ class ArduCtrl(Plugin):
     #   except IndexError: break
 
   def transmit(self, event):
-    Debug(self, f'SEND {event.id};')
+    Debug(self, f'SEND {event.key};')
     # TODO: parameters
     self.conn.write(event.id + b';')
 
