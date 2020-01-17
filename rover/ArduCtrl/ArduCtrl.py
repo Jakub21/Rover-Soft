@@ -6,8 +6,8 @@ class ArduCtrl(Plugin):
     self.addEventHandler('ArduSend', self.transmit)
     self.parser = Parser()
     self.outFuncKeys = Namespace(
-      RequestTmprReadings = 0,
-      SetServoPositions = 1,
+      RequestTmprReadings = self.itob(0),
+      SetServoPositions = self.itob(1),
     )
     self.inFuncKeys = {
       1: 'TmprRaspberry',
@@ -21,7 +21,7 @@ class ArduCtrl(Plugin):
     data = self.conn.read(self.cnf.ReadBytesPerLoop)
     if len(data): self.parser.push(data)
     if not(self.__pluginable__.tick % (2 * self.executor.tpsMon.tps)):
-      Event(self, 'ArduSend', data=b'\x00;')
+      Event(self, 'ArduSend', data=self.outFuncKeys.RequestTmprReadings)
     self.parser.parse()
     while True:
       try:
@@ -36,3 +36,9 @@ class ArduCtrl(Plugin):
   def quit(self):
     super().quit()
     self.conn.close()
+
+  @staticmethod
+  def itob(*ints):
+    result = b''
+    for i in list(ints): result += bytes([i])
+    return result
