@@ -19,7 +19,7 @@ class ArduCtrl(Plugin):
     super().update()
     data = self.conn.read(self.cnf.ReadBytesPerLoop)
     if len(data): self.parser.push(data)
-    if not(self.tick % (2 * self.executor.tpsMon.tps)):
+    if not(self.__pluginable__.tick % (2 * self.executor.tpsMon.tps)):
       Event(self, 'ArduSend', data=eval(f"b'\x00;'"))
     self.parser.parse()
     while True:
