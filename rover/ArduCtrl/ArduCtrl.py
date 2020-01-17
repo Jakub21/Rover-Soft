@@ -18,16 +18,17 @@ class ArduCtrl(Plugin):
   def update(self):
     super().update()
     self.setPluginOutputs()
-    data = self.conn.read(self.cnf.ReadBytesPerLoop)
-    if len(data): self.parser.push(data)
     if not(self.__pluginable__.tick % (2 * self.executor.tpsMon.tps)):
       Event(self, 'ArduSend', data=self.outFuncKeys.RequestTmprReadings)
-    self.parser.parse()
-    while True:
-      try:
-        received = self.parser.pop()
-        Debug(self, f'RECV {received}')
-      except IndexError: break
+    data = self.conn.read(self.cnf.ReadBytesPerLoop)
+    Debug(self, f'RECV {data}')
+    # if len(data): self.parser.push(data)
+    # self.parser.parse()
+    # while True:
+    #   try:
+    #     received = self.parser.pop()
+    #     Debug(self, f'RECV {received}')
+    #   except IndexError: break
 
   def transmit(self, event):
     Debug(self, f'SEND {event.data}')
