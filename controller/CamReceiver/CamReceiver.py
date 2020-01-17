@@ -11,6 +11,7 @@ class CamReceiver(Plugin):
 
   def update(self):
     super().update()
+    self.setPluginOutputs()
     try: raw = self.socket.recv_string()
     except zmq.error.Again: return
     img = base64.b64decode(raw)

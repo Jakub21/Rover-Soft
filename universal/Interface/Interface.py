@@ -48,6 +48,7 @@ class Interface(Plugin):
     super().update()
     if self.root.leave: self.stopProgram()
     else: self.root.update()
+    self.setPluginOutputs()
 
   def quit(self):
     super().quit()
