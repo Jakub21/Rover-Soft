@@ -5,10 +5,18 @@ class ArduCtrl(Plugin):
     self.conn = SerialLib.Serial(self.cnf.PortName, self.cnf.Baudrate, timeout=0)
     self.addEventHandler('ArduSend', self.transmit)
     self.parser = Parser(self.cnf.ResponseKeys)
+    # Store sensor readings
+    self.addEventHandler('ArduTmprRspb',
+      lambda evt: self.setReading('TmprRspb', evt))
+    self.addEventHandler('ArduTmprAccu',
+      lambda evt: self.setReading('TmprAccu', evt))
+    self.addEventHandler('ArduTmprCnvrt',
+      lambda evt: self.setReading('TmprCnvrt', evt))
+    self.readings = Namespace()
 
   def update(self):
     super().update()
-    self.setPluginOutputs()
+    self.setPluginOutputs(**self.readings.__dict__)
     if not(self.__pluginable__.tick % (2 * max(self.executor.tpsMon.tps, 120))):
       Event(self, 'ArduSend', key='RequestTmpr')
     data = self.conn.read(self.cnf.ReadBytesPerLoop)
@@ -32,6 +40,12 @@ class ArduCtrl(Plugin):
         raise TypeError('Only ints are allowed in ArduSend parameters')
       cleanParams += self.itob(param)
     self.conn.write(key + cleanParams + b';')
+
+  def setReading(self, readingKey, event):
+    if readingKey in ['TmprRspb', 'TmprAccu', 'TmprCnvrt']:
+      self.readings[readingKey] = event.params[0]
+    else:
+      Warn(self, 'Can not set reading, setter not implemented')
 
   def quit(self):
     super().quit()
