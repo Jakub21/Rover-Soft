@@ -4,36 +4,34 @@ class ArduCtrl(Plugin):
     super().init()
     self.conn = SerialLib.Serial(self.cnf.PortName, self.cnf.Baudrate, timeout=0)
     self.addEventHandler('ArduSend', self.transmit)
-    self.parser = Parser()
-    self.outputKeys = Namespace(
-      RequestTmprReadings = self.itob(0),
-      SetServoPositions = self.itob(1),
-    )
-    self.inFuncKeys = {
-      1: 'TmprRaspberry',
-      2: 'TmprBattery',
-      3: 'TmprConverters',
-    }
+    self.parser = Parser(self.cnf.ResponseKeys)
 
   def update(self):
     super().update()
     self.setPluginOutputs()
-    if not(self.__pluginable__.tick % (2 * self.executor.tpsMon.tps)):
-      Event(self, 'ArduSend', key=self.outputKeys.RequestTmprReadings)
+    if not(self.__pluginable__.tick % (2 * max(self.executor.tpsMon.tps, 120))):
+      Event(self, 'ArduSend', key='RequestTmpr')
     data = self.conn.read(self.cnf.ReadBytesPerLoop)
-    Debug(self, f'RECV {data}')
-    # if len(data): self.parser.push(data)
-    # self.parser.parse()
-    # while True:
-    #   try:
-    #     received = self.parser.pop()
-    #     Debug(self, f'RECV {received}')
-    #   except IndexError: break
+    if len(data): self.parser.push(data)
+    self.parser.parse()
+    while not self.parser.isEmpty():
+      try: response = self.parser.pop()
+      except ValueError: continue
+      Event(self, f'Ardu{response.key}', params=response.params)
 
   def transmit(self, event):
-    Debug(self, f'SEND {event.key};')
-    # TODO: parameters
-    self.conn.write(event.id + b';')
+    try: key = self.itob(self.cnf.OutputKeys[event.key])
+    except KeyError as exc: raise KeyError(f'Invalid ArudCtrl output key "{event.key}"')
+    try: event.params
+    except AttributeError: event.params = []
+    cleanParams = b''
+    if len(event.params) > self.cnf.MaxCallLength -1:
+      raise ValueError(f'Only {self.cnf.MaxCallLength} characters per call are allowed')
+    for param in event.params:
+      if type(param) != int:
+        raise TypeError('Only ints are allowed in ArduSend parameters')
+      cleanParams += self.itob(param)
+    self.conn.write(key + cleanParams + b';')
 
   def quit(self):
     super().quit()
