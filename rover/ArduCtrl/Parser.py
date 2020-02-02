@@ -9,7 +9,7 @@ class Parser:
     self.data += data.replace(b'\r',b'')
 
   def pop(self):
-    result = self.received[0].decode('ansi').split()
+    result = self.received[0].decode('ascii').split()
     self.received = self.received[1:]
     key = int(result[0])
     params = [float(x) for x in result[1:]]
