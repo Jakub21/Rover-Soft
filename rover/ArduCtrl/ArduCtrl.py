@@ -17,7 +17,7 @@ class ArduCtrl(Plugin):
   def update(self):
     super().update()
     self.setPluginOutputs(**self.readings.__dict__)
-    if not(self.__pluginable__.tick % (2 * max(self.executor.tpsMon.tps, 120))):
+    if not(self.__pluginable__.tick % self.cnf.RequestReadingsInterval):
       Event(self, 'ArduSend', key='RequestTmpr')
     data = self.conn.read(self.cnf.ReadBytesPerLoop)
     if len(data): self.parser.push(data)

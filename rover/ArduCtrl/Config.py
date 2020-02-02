@@ -4,6 +4,7 @@ class Config:
   Baudrate = 9600
   ReadBytesPerLoop = 512
   MaxCallLength = 16
+  RequestReadingsInterval = 50 # in plugin ticks
 
   OutputKeys = Namespace(
     RequestTmpr = 0,
