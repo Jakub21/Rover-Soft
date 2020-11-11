@@ -23,7 +23,7 @@ class Gamepad(Plugin):
         cnf.gpSpecs.axes != self.pad.get_numaxes() or \
         cnf.gpSpecs.hats != self.pad.get_numhats() or \
         cnf.gpSpecs.balls != self.pad.get_numballs():
-      raise ValueError('Unknown gamepad specification')
+      raise ValueError('Invalid gamepad specification')
 
     # Check if amount of controls in config bindings is the same as in specification
     if cnf.gpSpecs.buttons != len(cnf.keysButtons) or \
