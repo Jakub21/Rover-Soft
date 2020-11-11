@@ -12,7 +12,7 @@ class TcpServer(Plugin):
 
   def initSocket(self):
     self.socket = scklib.socket()
-    Note(self, f'Binding TPC server to {self.ownAddress}:{self.usedPort}')
+    Note(self, f'Binding TCP server to {self.ownAddress}:{self.usedPort}')
     self.socket.setsockopt(scklib.SOL_SOCKET, scklib.SO_REUSEADDR, 1)
     self.socket.bind((self.ownAddress, self.usedPort))
     self.socket.settimeout(self.cnf.timeOut)
