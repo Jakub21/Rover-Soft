@@ -8,12 +8,14 @@ if __name__ == '__main__':
   prog.updateSettings({
     'Kernel.MaxProgramTicksPerSec': 100,
     'Kernel.MaxExecutorTicksPerSec': 80,
+    'Kernel.AutoAddTpsToPluginOutputs': True,
     'Compiler.pluginDirectories' : ['./universal', './rover'],
     'Logger.timeMode': 'relative',
   })
   prog.preload()
   prog.configPlugin('ArduCtrl', {
-    'PortName': '/dev/ttyUSB0',
+    # 'PortName': '/dev/ttyUSB0',
+    'PortName': 'COM1',
   })
   prog.configPlugin('CamSender', {
     'cameraIndex': 0,
