@@ -8,6 +8,8 @@ class CamSender(Plugin):
     self.socket.RCVTIMEO = int(self.cnf.timeOut * 1e3)
 
     self.camera = ocv.VideoCapture(self.cnf.cameraIndex)
+    if not self.camera.isOpened():
+      Warn(self, f'Could not open camera (index = {self.cnf.cameraIndex})')
 
   def update(self):
     super().update()
